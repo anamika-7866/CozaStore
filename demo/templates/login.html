@@ -1,0 +1,246 @@
+{% extends "header.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static "css/default.css" %}" type='text/css'>
+    <link rel="stylesheet" href="{% static "css/theme.css" %}" type='text/css'>
+<link rel="stylesheet" href="{% static "css/login.css" %}" type='text/css'>
+{% endblock css %}
+
+
+{% block main %}
+<br>
+<br>
+<br>
+
+    <main id="PageContainer" class="main-content customers/login" id="MainContent" role="main">
+            <script type="application/ld+json">
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "item": {
+                                    "@id": "/",
+                                    "name": "Home"
+                                }
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "item": {
+                                    "@id": "",
+                                    "name": ""
+                                }
+                            }
+                        ]
+                    }</script>
+            <h1 class="page-title tc">My Account</h1>
+            <div class="page-width grid login-register">
+                <div class="gitem wd50-md mb20">
+                    <div class="wrap">
+                        <div id="CustomerLoginForm" class="form-vertical">
+                            <h4>LOGIN</h4>
+                            <p>If you have an account with us, please log in.</p>
+                            <div class="note form-success hide" id="ResetSuccess">We &#39;ve sent you an email with a
+                                link to update your password. </div>
+                            <form method="post" action="/userlog/" id="customer_login" accept-charset="UTF-8"
+                                data-login-with-shop-sign-in="true" novalidate="novalidate">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="customer_login" />
+                                <input type="hidden" name="utf8" value="✓" />
+                                <label for="CustomerEmail" class="hide">Email</label>
+                                <input type="email" name="customeremail" placeholder="Email" id="CustomerEmail"
+                                    class="" autocorrect="off" autocapitalize="off" autofocus>
+                                <label for="CustomerPassword" class="hide">Password</label>
+                                <input type="password" value="" name="customerpassword" placeholder="Password"
+                                    id="CustomerPassword" class="">
+                                <div class="fl f-aic f-jcsb">
+                                    <input type="submit" class="btn" value="Sign In">
+                                    <a href="#recover" id="RecoverPassword">Forgot your password?</a>
+                                </div>
+                            </form>
+                        </div>
+                        <div id="RecoverPasswordForm" class="hide">
+                            <h4>Reset your password</h4>
+                            <div class="form-vertical">
+                                <form method="post" action="/account/recover" accept-charset="UTF-8">
+                                    <input type="hidden" name="form_type" value="recover_customer_password" />
+                                    <input type="hidden" name="utf8" value="✓" />
+                                    <p>We will send you an email to reset your password.</p>
+                                    <label for="RecoverEmail" class="hide">Email</label>
+                                    <input type="email" value="" name="email" id="RecoverEmail" placeholder="Email"
+                                        class="input-full" autocorrect="off" autocapitalize="off">
+                                    <div class="fl f-aic f-jcsb">
+                                        <input type="submit" class="btn" value="Submit">
+                                        <button type="button" id="HideRecoverPasswordLink"
+                                            class="text-link cancel">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock main %}  
+   
+    
+{% block scripts %}
+    <script>
+        let l = {
+            "message": ["🔔 Don't forget this...", "Come Back"],
+            "delay": 1000,
+            "titleTag": document.getElementsByTagName("title")[0]
+        };
+        l.titleTag && (l.originalTitle = l.titleTag.innerText,
+            l.isSingle = l.message.length < 2,
+            l.isActive = !1,
+            l.myTimer,
+            document.addEventListener('visibilitychange', () => {
+                document.visibilityState === 'visible' ? function () {
+                    if (!l.isActive)
+                        return;
+                    clearInterval(l.myTimer),
+                        l.titleTag.innerText = l.originalTitle
+                }() : function () {
+                    let e = 0
+                        , t = l.message[e];
+                    if (l.isActive = !0,
+                        l.titleTag.innerText = t,
+                        l.isSingle)
+                        return;
+                    l.myTimer = setInterval(function () {
+                        let i = l.message[++e];
+                        i || (e = 0,
+                            i = t),
+                            l.titleTag.innerText = i
+                    }, l.delay)
+                }()
+            }
+            ));
+        window.addEventListener('DOMContentLoaded', function () {
+            $(document).ready(function () {
+                if ((typeof Shopify) === 'undefined') {
+                    Shopify = {};
+                }
+                Shopify.pnProduct = function (handle, callback) {
+                    $.ajax({
+                        url: '/products/' + handle + '.js',
+                        dataType: 'json',
+                        success: function (data) {
+                            callback(data);
+                        },
+                        cache: true,
+                        timeout: 5700
+                    });
+                }
+                    ;
+                function productNotify() {
+                    var productsArray = ["age-control-face-serum", "brightening-face-serum", "fix-powder-plus-foundation", "hyaluronic-acid-face-serum", "natural-moisturizing-factors", "rose-water-toner-tightens-pores", "serum-for-glowing-skin", "youth-infinity-day-creme"]
+                        , curproductIndex = Math.floor((Math.random() * productsArray.length - 1) + 1);
+                    $('#prodNotify').addClass("active");
+                    setTimeout(function () {
+                        Shopify.pnProduct(productsArray[curproductIndex], function (data) {
+                            var fakeTimeOrder = Math.floor((Math.random() * 60) + 1)
+                                , fklocations = ["Singapore", "New York", "Dubai", "Paris", "London", "Amsterdam", "Sydney"]
+                                , rand = Math.floor(Math.random() * 7)
+                                , pimg = data.featured_image
+                                , pimg_path = pimg.replace(/(\.[^\.]*$|$)/, '_100x' + '$&');
+                            $('#prodNotify .pname a').html(data.title).attr('href', '/collections/skincare' + data.url);
+                            $('#prodNotify .imgLink').attr('href', '/collections/skincare' + data.url);
+                            $('#prodNotify img').attr({
+                                'data-src': pimg_path,
+                                alt: data.title
+                            }).addClass("lazyload");
+                            $('#prodNotify .time').html(fakeTimeOrder);
+                            $('#prodNotify .location').html(fklocations[rand]);
+                            $('#prodNotify').removeClass("active");
+                        });
+                    }, 5000);
+                }
+                setInterval(productNotify, 10100);
+                $('.closeNotify').click(function () {
+                    $('#prodNotify').remove();
+                });
+                var cookieSignup = "cookieSignup"
+                    , date = new Date();
+                if (getCookie('cookieSignup') != 'true' && window.location.href.indexOf("challenge#newsletterPopup") <= -1) {
+                    setTimeout(function () {
+                        if ($('#newsletter-modal').length) {
+                            $.magnificPopup.open({
+                                items: {
+                                    src: '#newsletter-modal'
+                                },
+                                type: 'inline',
+                                removalDelay: 300,
+                                mainClass: 'mfp-zoom-in',
+                                callbacks: {
+                                    close: function () {
+                                        nwCookie();
+                                        $.magnificPopup.proto.close.call(this);
+                                    }
+                                }
+                            });
+                        }
+                    }, 5000);
+                }
+                $("#newsletter-modal form").submit(function () {
+                    nwCookie()
+                });
+                function nwCookie() {
+                    if ($("#dontshow").prop("checked") == true) {
+                        setCookie('cookieSignup', 'true', 1)
+                    }
+                }
+                $(".mcNewsletter").submit(function (e) {
+                    var $form = $(this);
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'GET',
+                        url: $(this).attr('action'),
+                        data: $(this).serialize(),
+                        cache: false,
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        error: function (err) {
+                            alert("Could not connect to the registration server. Please try again later.");
+                        },
+                        success: function (data) {
+                            if (data.result == "success") {
+                                $($form).find(".form-success").html(data.msg).show();
+                                $($form).find(".errors").hide();
+                            } else {
+                                $($form).find(".errors").html(data.msg).show();
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <script type="application/ld+json">
+
+            {
+                "@context": "http://schema.org",
+                "@type": "Organization",
+                "name": "Avone - Multipurpose Shopify Theme",
+                "logo": "https://avon-demo.myshopify.com/cdn/shop/files/skin-care-logo.png?v=1725282746",
+                "sameAs": [
+                    "https://twitter.com/adornthemes",
+                    "https://www.facebook.com/adornthemes/",
+                    "https://in.pinterest.com/adornthemes/",
+                    "https://www.instagram.com/adornthemes/",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "url": "https://avon-demo.myshopify.com"
+            }
+        </script>
+{% endblock scripts %}
+

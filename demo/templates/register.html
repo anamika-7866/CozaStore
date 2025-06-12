@@ -1,0 +1,240 @@
+{% extends "header.html" %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "css/default.css" %}" type='text/css'>
+    <link rel="stylesheet" href="{% static "css/theme.css" %}" type='text/css'>
+<link rel="stylesheet" href="{% static "css/register.css" %}" type='text/css'>
+{% endblock css %}
+
+{% block main %}
+<br>
+<br>
+<br>
+    <main id="PageContainer" class="main-content customers/register" id="MainContent" role="main">
+        <div id="shopify-section-template--16205725532227__main" class="shopify-section">
+            <script type="application/ld+json">
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "item": {
+                                    "@id": "/",
+                                    "name": "Home"
+
+                                    
+                                }
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "item": {
+                                    "@id": "",
+                                    "name": ""
+                                }
+                            }
+                        ]
+                    }</script>
+            <div class="page-width" style="max-width:600px">
+                <h1 class="page-title tc">Create an Account</h1>
+                <div class="login-register medium-up--one-half" style="margin:auto;">
+                    <div class="form-vertical">
+                        <form method="post" action="/usersignup/" id="RegisterForm" accept-charset="UTF-8"
+                            data-login-with-shop-sign-up="true" novalidate="novalidate">
+                            {% csrf_token %}
+                            <input type="hidden" name="form_type" value="create_customer" />
+                            <input type="hidden" name="utf8" value="✓" />
+                            <label for="FirstName" class="hide">First Name</label>
+                            <input type="text" name="customerfirst_name" placeholder="First Name" id="FirstName"
+                                autofocus>
+                            <label for="LastName" class="hide">Last Name</label>
+                            <input type="text" name="customerlast_name" placeholder="Last Name" id="LastName">
+                            <label for="Email" class="hide">Email</label>
+                            <input type="email" name="customeremail" id="RegisterForm-email" placeholder="Email"
+                                class="" required autocorrect="off" autocapitalize="off">
+                            <label for="CreatePassword" class="hide">Password</label>
+                            <input type="password" name="customerpassword" placeholder="Password"
+                                id="RegisterForm-password" class="" required>
+                            <p>
+                                <label for="accepts_marketing">
+                                    <input type="hidden" name="customer[accepts_marketing]" value="" />
+                                    <input type="checkbox" id="accepts_marketing" name="customer[accepts_marketing]"
+                                        class="custCheck" checked="checked" />
+                                    <span class="checkbox"></span>
+                                    Subscribe to stay updated with new products and offers!
+
+                                </label>
+                            </p>
+                            <p class="tc">
+                                <input type="submit" value="Submit" class="btn">
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock main %}    
+   
+    
+   
+{% block scripts %}
+<link rel="stylesheet"
+        href="//avon-demo.myshopify.com/cdn/shop/t/206/assets/default.css?v=40115090882428946031725282310"
+        type="text/css" media="all">
+    <script>
+        let l = {
+            "message": ["🔔 Don't forget this...", "Come Back"],
+            "delay": 1000,
+            "titleTag": document.getElementsByTagName("title")[0]
+        };
+        l.titleTag && (l.originalTitle = l.titleTag.innerText,
+            l.isSingle = l.message.length < 2,
+            l.isActive = !1,
+            l.myTimer,
+            document.addEventListener('visibilitychange', () => {
+                document.visibilityState === 'visible' ? function () {
+                    if (!l.isActive)
+                        return;
+                    clearInterval(l.myTimer),
+                        l.titleTag.innerText = l.originalTitle
+                }() : function () {
+                    let e = 0
+                        , t = l.message[e];
+                    if (l.isActive = !0,
+                        l.titleTag.innerText = t,
+                        l.isSingle)
+                        return;
+                    l.myTimer = setInterval(function () {
+                        let i = l.message[++e];
+                        i || (e = 0,
+                            i = t),
+                            l.titleTag.innerText = i
+                    }, l.delay)
+                }()
+            }
+            ));
+        window.addEventListener('DOMContentLoaded', function () {
+            $(document).ready(function () {
+                if ((typeof Shopify) === 'undefined') {
+                    Shopify = {};
+                }
+                Shopify.pnProduct = function (handle, callback) {
+                    $.ajax({
+                        url: '/products/' + handle + '.js',
+                        dataType: 'json',
+                        success: function (data) {
+                            callback(data);
+                        },
+                        cache: true,
+                        timeout: 5700
+                    });
+                }
+                    ;
+                function productNotify() {
+                    var productsArray = ["age-control-face-serum", "brightening-face-serum", "fix-powder-plus-foundation", "hyaluronic-acid-face-serum", "natural-moisturizing-factors", "rose-water-toner-tightens-pores", "serum-for-glowing-skin", "youth-infinity-day-creme"]
+                        , curproductIndex = Math.floor((Math.random() * productsArray.length - 1) + 1);
+                    $('#prodNotify').addClass("active");
+                    setTimeout(function () {
+                        Shopify.pnProduct(productsArray[curproductIndex], function (data) {
+                            var fakeTimeOrder = Math.floor((Math.random() * 60) + 1)
+                                , fklocations = ["Singapore", "New York", "Dubai", "Paris", "London", "Amsterdam", "Sydney"]
+                                , rand = Math.floor(Math.random() * 7)
+                                , pimg = data.featured_image
+                                , pimg_path = pimg.replace(/(\.[^\.]*$|$)/, '_100x' + '$&');
+                            $('#prodNotify .pname a').html(data.title).attr('href', '/collections/skincare' + data.url);
+                            $('#prodNotify .imgLink').attr('href', '/collections/skincare' + data.url);
+                            $('#prodNotify img').attr({
+                                'data-src': pimg_path,
+                                alt: data.title
+                            }).addClass("lazyload");
+                            $('#prodNotify .time').html(fakeTimeOrder);
+                            $('#prodNotify .location').html(fklocations[rand]);
+                            $('#prodNotify').removeClass("active");
+                        });
+                    }, 5000);
+                }
+                setInterval(productNotify, 10100);
+                $('.closeNotify').click(function () {
+                    $('#prodNotify').remove();
+                });
+                var cookieSignup = "cookieSignup"
+                    , date = new Date();
+                if (getCookie('cookieSignup') != 'true' && window.location.href.indexOf("challenge#newsletterPopup") <= -1) {
+                    setTimeout(function () {
+                        if ($('#newsletter-modal').length) {
+                            $.magnificPopup.open({
+                                items: {
+                                    src: '#newsletter-modal'
+                                },
+                                type: 'inline',
+                                removalDelay: 300,
+                                mainClass: 'mfp-zoom-in',
+                                callbacks: {
+                                    close: function () {
+                                        nwCookie();
+                                        $.magnificPopup.proto.close.call(this);
+                                    }
+                                }
+                            });
+                        }
+                    }, 5000);
+                }
+                $("#newsletter-modal form").submit(function () {
+                    nwCookie()
+                });
+                function nwCookie() {
+                    if ($("#dontshow").prop("checked") == true) {
+                        setCookie('cookieSignup', 'true', 1)
+                    }
+                }
+                $(".mcNewsletter").submit(function (e) {
+                    var $form = $(this);
+                    e.preventDefault();
+                    $.ajax({
+                        type: 'GET',
+                        url: $(this).attr('action'),
+                        data: $(this).serialize(),
+                        cache: false,
+                        dataType: 'json',
+                        contentType: "application/json; charset=utf-8",
+                        error: function (err) {
+                            alert("Could not connect to the registration server. Please try again later.");
+                        },
+                        success: function (data) {
+                            if (data.result == "success") {
+                                $($form).find(".form-success").html(data.msg).show();
+                                $($form).find(".errors").hide();
+                            } else {
+                                $($form).find(".errors").html(data.msg).show();
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <script type="application/ld+json">
+
+            {
+                "@context": "http://schema.org",
+                "@type": "Organization",
+                "name": "Avone - Multipurpose Shopify Theme",
+                "logo": "https://avon-demo.myshopify.com/cdn/shop/files/skin-care-logo.png?v=1725282746",
+                "sameAs": [
+                    "https://twitter.com/adornthemes",
+                    "https://www.facebook.com/adornthemes/",
+                    "https://in.pinterest.com/adornthemes/",
+                    "https://www.instagram.com/adornthemes/",
+                    "",
+                    "",
+                    "",
+                    ""
+                ],
+                "url": "https://avon-demo.myshopify.com"
+            }
+    </script>
+{% endblock scripts %}
+    

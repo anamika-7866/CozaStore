@@ -1,0 +1,280 @@
+{% extends "header.html" %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/default.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/theme.css' %}" type="text/css" />
+<link
+  rel="stylesheet"
+  href="{% static 'css/wishlist.css' %}"
+  type="text/css"
+  media="all"
+/>
+{% endblock css %}
+{% block main %}
+<main id="PageContainer" class="main-content page" role="main">
+  <div
+    id="shopify-section-template--16205726056515__wishlist"
+    class="shopify-section"
+  >
+    <div class="bredcrumbWrap">
+      <nav
+        class="page-width breadcrumbs"
+        role="navigation"
+        aria-label="breadcrumbs"
+      >
+        <a href="/" title="Back to the home page">Home</a
+        ><span aria-hidden="true" class="symbol">|</span
+        ><span class="fw-500">Wishlist</span>
+      </nav>
+    </div>
+    <style>
+      #wishProducts .removeItem {
+        padding: 8px;
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        right: -0px;
+        top: -15px;
+        z-index: 4;
+      }
+      #wishProducts .wishlist {
+        display: none;
+      }
+      #wishProducts {
+        padding-top: 30px;
+      }
+    </style>
+    <div class="page-width">
+      <h1 class="page-title">Wishlist</h1>
+      <div
+        class="grid rwcols-2 rwcols-md-3 rwcols-lg-4 grid-products tc"
+        id="wishProducts"
+      >
+      {% for i in product_data %}
+      {# MODIFIED LINE: Added data-product-id attribute #}
+      <div class="gitem pr" data-pr="{{ i.product.name|slugify }}" data-product-id="{{ i.product.id }}">
+        <button
+          class="btn removeItem"
+          title="Remove From Wishlist">
+          <i class="at at-times-r" aria-hidden="true"></i>
+        </button>
+        <div class="grid-view-item style1 wow fadeIn" data-wow-delay="-50ms">
+          <div class="gview-img">
+            <a class="gimg-link" href="/collections/all/products/{{ i.product.name|slugify }}" title="{{i.product.name}}">
+              <div
+                class="gitem-img primary lazyloaded"
+                data-bgset="//avon-demo.myshopify.com/cdn/shop/files/demo17-8_150x.jpg?v=1724926486 150w 194h,...裁剪..."
+                data-parent-fit="contain"
+                style="background-image: url('{{ i.image1 }}');">
+                <picture style="display: none">
+                  <source
+                    srcset="{{i.image1}}"/>
+                  <img
+                    alt=""
+                    class="lazyautosizes lazyloaded ls-is-cached"
+                    data-sizes="auto"
+                    data-parent-fit="cover"
+                    sizes="323px"/></picture>
+              </div>
+              <div
+                class="gitem-img hover lazyloaded"
+                data-bgset="//avon-demo.myshopify.com/cdn/shop/files/face-serum2_150x.jpg?v=1724930038 150w 194h,...裁剪..."
+                data-parent-fit="contain"
+                style="
+                  background-image: url({{i.image2}});">
+                <picture style="display: none"
+                  ><source
+                    srcset="{{i.image2}}" />
+                  <img
+                    alt=""
+                    class="lazyautosizes lazyloaded ls-is-cached"
+                    data-sizes="auto"
+                    data-parent-fit="cover"
+                    sizes="323px"/></picture>
+              </div>
+              <div class="gitem-img hover variantImg"></div
+            ></a>
+            <div class="button-set hide-sm">
+              <a
+                class="btn wishlist addto-wishlist"
+                href="/pages/wishlist"
+                rel="{{ i.product.name|slugify }}"
+                aria-label="Add to Wishlist"
+                ><i class="at at-heart-l"></i
+                ><span class="tooltip-label">Add to Wishlist</span></a
+              >
+              <button class="btn add-to-cart" aria-label="Add to cart"
+                  data-pid="{{i.product.id}}"
+                  data-size="M"
+                  data-color="Red"
+                  data-quantity="1">
+                  <i class="at at-cart-l" aria-hidden="true"></i>
+                  <span class="tooltip-label">Add to cart</span>
+              </button>
+            </div>
+          </div>
+          <div class="details">
+            <a
+              href="/collections/all/products/{{ i.product.name|slugify }}"
+              class="grid-view-item__title"
+              >{{i.product.name}}</a
+            >
+            <div class="priceWraper fl f-aic f-jcc f-wrap">
+              <span class="pr_price">${{i.product.price}}</span>
+            </div>
+            <ul class="gridSwatches fl f-aic f-jcc"></ul>
+          </div>
+          <div class="shopWrapper" id="ProductSection-{{ i.product.id }}"></div>
+        </div>
+      </div>
+      {% endfor %}
+      </div>
+      <p class="tc hide nowishItem">Products weren't added to the wishlist.</p>
+    </div>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+  </div>
+</main>
+{% endblock main %}
+
+{% block script %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wishProductsContainer = document.getElementById('wishProducts');
+  const csrfToken = document.getElementById('csrf_token').value;
+
+  if (wishProductsContainer) {
+    wishProductsContainer.addEventListener('click', function (e) {
+      const removeButton = e.target.closest('.removeItem');
+      if (removeButton) {
+        e.preventDefault();
+        const gitem = removeButton.closest('.gitem');
+        if (!gitem) return;
+
+        const productId = gitem.getAttribute('data-product-id'); // Get the actual product ID
+        const productHandle = gitem.getAttribute('data-pr'); // For localStorage if you still use it
+
+        if (!productId) {
+          console.error("Product ID not found for removal.");
+          alert("Could not remove item: Product ID missing.");
+          return;
+        }
+
+        // Make a fetch call to the server to remove the item from the database
+        fetch(`/remove-wishlist-item/${productId}/`, { // Use the correct product ID
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json' // Good practice, though body is empty for this specific request
+          },
+          // No body is needed as the ID is in the URL and the view expects POST
+        })
+        .then(response => {
+          if (!response.ok) {
+            // Try to get error message from server if available
+            return response.json().then(err => { throw err; });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            console.log(data.message);
+
+            // 1. Remove from DOM with fade effect
+            gitem.style.transition = "opacity 0.5s ease";
+            gitem.style.opacity = 0;
+            setTimeout(() => {
+              gitem.remove();
+              // 2. Check if wishlist is empty in the DOM
+              if (wishProductsContainer.querySelectorAll('.gitem').length === 0) {
+                const noWishItemMsg = document.querySelector('.nowishItem');
+                if (noWishItemMsg) {
+                    noWishItemMsg.classList.remove('hide');
+                }
+              }
+            }, 500);
+
+            // 3. Optionally, update localStorage (if you use it for other client-side logic)
+            // Ensure productHandle is the correct key for your localStorage implementation
+            let wishlistStorage = localStorage.getItem('wishlist') || '';
+            let items = wishlistStorage.split('+').filter(item => item && item !== productHandle);
+            localStorage.setItem('wishlist', items.join('+'));
+
+          } else {
+            console.error("Failed to remove item from wishlist:", data.message);
+            alert("Error: " + (data.message || "Could not remove item from wishlist."));
+          }
+        })
+        .catch(error => {
+          console.error('Error removing item from wishlist:', error);
+          let errorMessage = "An error occurred while trying to remove the item.";
+          if (error && error.message) {
+            errorMessage += " " + error.message;
+          }
+          alert(errorMessage);
+        });
+      }
+    });
+  }
+});
+</script>
+
+<input type="hidden" value="{{csrf_token}}" id='csrf_token'>
+<script>
+const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+addToCartButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const pid = button.getAttribute('data-pid');
+        const size = button.getAttribute('data-size');
+        const color = button.getAttribute('data-color');
+        const quantity = button.getAttribute('data-quantity');
+        const csrf_token = document.getElementById('csrf_token').value;
+
+        fetch('/addtocart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf_token
+            },
+            body: JSON.stringify({
+                pid: pid,
+                quantity: quantity,
+                size: size,
+                color: color
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Add to cart response:', data);
+
+            // ✅ SweetAlert message
+            swal({
+                title: "Success!",
+                text: `Successfully added to cart!`,
+                icon: "success",
+                button: "OK"
+            });
+
+            // Optional: Also remove from wishlist
+            return fetch('/remove_from_wishlist_after_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrf_token
+                },
+                body: JSON.stringify({ product_id: pid })
+            });
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Removed from wishlist:', result);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+
+{% endblock script %}
