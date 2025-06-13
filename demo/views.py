@@ -72,33 +72,36 @@ def productsearch(request):
 
 
 def contact(request):
+    categories=Category.objects.all()
     if request.method=="POST":
         email=request.POST.get('email')
         msg=request.POST.get('msg')
         contact=Contact.objects.create(email=email,msg=msg)
         contact.save()
         print("_______",email,msg)
-    return render(request,'contact.html')
+    return render(request,'contact.html',{'categories':categories,})
 
-def wishlist(request):
-    return render(request,'wishlist.html')
 
 def about(request):
-    return render(request,'about.html')
+    categories=Category.objects.all()
+    return render(request,'about.html',{'categories':categories,})
 
 
 def blogdetail(request):
     return render(request,'blog-detail.html')
 
 def blog(request):
+    categories=Category.objects.all()
     relatedproducts=Product.objects.all()[:4]  
-    return render(request,'blog.html',{'relatedproducts':relatedproducts})
+    return render(request,'blog.html',{'relatedproducts':relatedproducts,'categories':categories,})
 
 def login1(request):
-    return render(request,'login.html')
+    categories=Category.objects.all()
+    return render(request,'login.html',{'categories':categories})
 
 def register(request):
-    return render(request,'register.html')
+    categories=Category.objects.all()
+    return render(request,'register.html',{'categories':categories})
 
 def header(request):
     categories=Category.objects.all()
@@ -155,6 +158,7 @@ def searchAJAX(request):
 
 @login_required
 def addtocart(request):
+    categories=Category.objects.all()
     if request.method=='POST':
         data=json.loads(request.body)
         pid=int(data['pid'])
@@ -178,12 +182,13 @@ def addtocart(request):
             cartitem.save()
             cart.total+=quantity*product.price
             cart.save()
-        return JsonResponse({'key':'value'})
+        return JsonResponse({'key':'value','categories':categories})
 
 
 
 @login_required
 def cartview(request):
+    categories=Category.objects.all()
     cart=Cart.objects.get(user=request.user)
     cartitems=CartItem.objects.filter(cart=cart)
     product_data=[]
@@ -197,9 +202,10 @@ def cartview(request):
             'total':i.quantity*product.price
                
         })   
-    return render(request,'shoping-cart.html',{'product_data':product_data})
+    return render(request,'shoping-cart.html',{'product_data':product_data,'categories':categories})
 
 def checkout(request):
+    categories=Category.objects.all()
     cart=Cart.objects.get(user=request.user)
     cartitems=CartItem.objects.filter(cart=cart)
     product_data=[]
@@ -216,7 +222,7 @@ def checkout(request):
                
         })   
     print("                                ",product_data)
-    return render(request,'checkout.html',{'product_data':product_data,'total':cart.total})
+    return render(request,'checkout.html',{'product_data':product_data,'total':cart.total,'categories':categories,})
 
 def removeitem(request, id):
     try:
@@ -264,6 +270,7 @@ def fetch_data(request):
         return JsonResponse({'key':'value'})
 
 def orderconfirm(request):
+    categories=Category.objects.all()
     if request.method=='POST':
         countrycode=request.POST.get('countryCode')
         delieverytype=request.POST.get('delivery_strategies')
@@ -279,16 +286,19 @@ def orderconfirm(request):
         confirm.CartItems.set(cartItem)
         confirm.save()
         return render(request,'checkout.html')
+    return render(request,'checkout.html',{'categories':categories})
 
-def productdetail(request,id):
-    print("adsfghjkldfgfhvjklmlkjhgfdsdfghjk",id)
-    data=Product.objects.get(id=id)
-    images=data.product_images.all()
-    print(images)
-    return render(request,'product-detail.html',{'details':data,'images':images})
+# def productdetail(request,id):
+#     categories=Category.objects.all()
+#     print("adsfghjkldfgfhvjklmlkjhgfdsdfghjk",id)
+#     data=Product.objects.get(id=id)
+#     images=data.product_images.all()
+#     print(images)
+#     return render(request,'product-detail.html',{'details':data,'images':images,'categories':categories,})
 
 @login_required
 def addtowishlist(request):
+    categories=Category.objects.all()
     if request.method=='POST':
         data=json.loads(request.body)
         pid=int(data['pid'])
@@ -296,10 +306,12 @@ def addtowishlist(request):
         wishlist,created=Wishlist.objects.get_or_create(user=request.user)
         wishlistItem,created=WishlistItem.objects.get_or_create(wishlist=wishlist,product=product)
         print(created)
-        return JsonResponse({'key':'value'})
+        return JsonResponse({'key':'value','categories':categories,})
 
 @login_required
 def viewwishlist(request):
+    categories=Category.objects.all()
+    
     wishlist=Wishlist.objects.get(user=request.user)
     wishlistitem=WishlistItem.objects.filter(wishlist=wishlist)
     product_data=[]
@@ -312,7 +324,7 @@ def viewwishlist(request):
             'image1':images[0].image.url if len(images) > 0 else '',
             'image2':images[0].image.url if len(images) > 0 else ''
                   })   
-    return render(request,'wishlist.html',{'product_data':product_data})
+    return render(request,'wishlist.html',{'product_data':product_data,'categories':categories,})
 
 @login_required
 def remove_from_wishlist(request, id):
@@ -327,6 +339,7 @@ def remove_from_wishlist(request, id):
     return JsonResponse({"success": False, "message": "Invalid request method."}, status=400)
 
 def productdetail(request,id):
+    categories=Category.objects.all()
     product = get_object_or_404(Product, id=id)
     images=product.product_images.all()
 
@@ -347,12 +360,13 @@ def productdetail(request,id):
         })
 
     context = {
+        'categories':categories,
         'product': product,
         'images':  images,
         'review':review
     }
 
-    return render(request, 'product-detail.html', context,)
+    return render(request, 'product-detail.html',context)
 
 
 @login_required
@@ -376,5 +390,6 @@ def remove_from_wishlist_after_cart(request):
 
 
 def ordertrack(request):
-    return render(request,"ordertrack.html")
+    categories=Category.objects.all()
+    return render(request,"ordertrack.html",{'categories':categories,})
 
